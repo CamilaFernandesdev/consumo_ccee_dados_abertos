@@ -14,28 +14,35 @@ class Mongo:
         
         """
         self.df = df
+        self.dicionario = dicionario
+        self.collection_name = collection
+        
+        # Variáveis que serão preenchidas após executar os métodos
         self.column_names = list(self.df.columns)
         self.dict_rename = dict()
-        self.collection_name = collection
-        self.dicionario = dicionario
         self.df_last_document = None
         
         # Conexão com o MongoDB
         self.mdb = MongoHistoricoOficial()
         self.collection = self.mdb[self.collection_name]
         
-    def last_document_information(self):
-        
-        last_document = self.collection.find_one(sort=[('_id', pymongo.ASCENDING)])
+    def document_information(self, position:str):
+        position = str().lowe().strip()            
+        if position == "first":
+            document = self.collection.find_one(sort=[('_id', pymongo.DESCENDING)])
+        elif position == "last":  
+            document = self.collection.find_one(sort=[('_id', pymongo.ASCENDING)])
+        else:
+            print('String invalid.')
         # Informação da últimos dado da collection em series pandas
-        self.df_last_document = pd.Series(last_document)
+        self.df_last_document = pd.Series(document)
         self.df_last_document = self.df_last_document.drop(index='_id')
     
     def _create_dict_rename(self):
          # Como os dados CCEE alteram constantemente
          # Cria um dicionário de renomeação utilizando dict comprehension
-        for key, value in self.DICIONARIO.items():
-            for regex in value:
+        for key, list_value in self.DICIONARIO.items():
+            for regex in list_value:
                 self.dict_rename.update({column: key  for column in self.column_names if re.match(regex, column)})
         
     def _verification_methods(self, columns_number=8):
