@@ -4,6 +4,12 @@ import pandas as pd
 
 from infra_copel import MongoHistoricoOficial
 
+# Adicionar método no código original
+def sort_values(self) -> None:
+    """Ordenar como os dados serão organizados no mongo."""
+    return self.df.sort_values(self.df.columns[0], inplace=True, ignore_index=True)
+
+
 
 class Mongo:
     """Classe que faz o update das informações do Mongo quando a base de dados sofre alterações."""
